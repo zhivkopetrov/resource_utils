@@ -2,27 +2,27 @@
 
 cmake_minimum_required(VERSION 3.10.2)
 
-include(${CMAKE_SOURCE_DIR}/utils/cmake_modules/helpers.cmake)
+if(TARGET resource_utils)
+    return()
+endif()
+
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake_helpers/helpers.cmake)
 
 project(resource_utils)
    
+set(_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/resource_utils")
+
 add_library(
     ${PROJECT_NAME} 
     STATIC
-        ""
-)
-
-set(_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/resource_utils")
-
-target_sources(${PROJECT_NAME} PRIVATE
-    "${_SRC_DIR}/common/ResourceFileHeader.cpp"
-    "${_SRC_DIR}/defines/SoundDefines.cpp"
-    "${_SRC_DIR}/resource_loader/ResourceLoader.cpp"
-    "${_SRC_DIR}/structs/CombinedStructs.cpp"
-    "${_SRC_DIR}/structs/DataHeader.cpp"
-    "${_SRC_DIR}/structs/ResourceData.cpp"
-    "${_SRC_DIR}/structs/FontData.cpp"
-    "${_SRC_DIR}/structs/SoundData.cpp"
+        "${_SRC_DIR}/common/ResourceFileHeader.cpp"
+        "${_SRC_DIR}/defines/SoundDefines.cpp"
+        "${_SRC_DIR}/resource_loader/ResourceLoader.cpp"
+        "${_SRC_DIR}/structs/CombinedStructs.cpp"
+        "${_SRC_DIR}/structs/DataHeader.cpp"
+        "${_SRC_DIR}/structs/ResourceData.cpp"
+        "${_SRC_DIR}/structs/FontData.cpp"
+        "${_SRC_DIR}/structs/SoundData.cpp"
 )
 
 set_target_cpp_standard(${PROJECT_NAME} 17)
@@ -46,6 +46,8 @@ if(USE_IWYU)
     enable_target_include_what_you_use(${PROJECT_NAME})
 endif(USE_IWYU)
 
+add_subdirectory(utils)
+
 #Linker dependacies
 target_link_libraries(
     ${PROJECT_NAME} 
@@ -55,8 +57,6 @@ target_link_libraries(
 if(BUILD_LIKE_POSITION_INDEPENDANT_CODE)
     enable_target_position_independent_code(${PROJECT_NAME})
 endif()  
-
-add_subdirectory(utils)
 
 
 
