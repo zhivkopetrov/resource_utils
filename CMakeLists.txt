@@ -41,18 +41,19 @@ target_include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-#invoke include-what-you-use (if it's enabled) for the current project
-if(USE_IWYU)
-    enable_target_include_what_you_use(${PROJECT_NAME})
-endif(USE_IWYU)
-
 add_subdirectory(utils)
 
 #Linker dependacies
 target_link_libraries(
     ${PROJECT_NAME} 
     PUBLIC
-        utils)   # -lutils.a
+        utils   # -lutils.a
+)
+        
+#invoke include-what-you-use (if it's enabled) for the current project
+if(USE_IWYU)
+    enable_target_include_what_you_use(${PROJECT_NAME})
+endif(USE_IWYU)
                       
 if(BUILD_LIKE_POSITION_INDEPENDANT_CODE)
     enable_target_position_independent_code(${PROJECT_NAME})
