@@ -6,7 +6,9 @@ if(TARGET resource_utils)
     return()
 endif()
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake_helpers/helpers.cmake)
+if(NOT CMAKE_HELPERS_INCLUDED)
+    include(${CMAKE_CURRENT_SOURCE_DIR}/cmake_helpers/helpers.cmake)
+endif()
 
 project(resource_utils)
    
@@ -41,7 +43,9 @@ target_include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-add_subdirectory(utils)
+if(NOT TARGET utils)
+    add_subdirectory(utils)
+endif()
 
 #Linker dependacies
 target_link_libraries(
