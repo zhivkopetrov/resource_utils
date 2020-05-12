@@ -14,7 +14,7 @@
 #include "resource_utils/structs/FontData.h"
 #include "resource_utils/structs/SoundData.h"
 #include "resource_utils/common/ResourceFileHeader.h"
-#include "utils/datatype/StringUtils.h"
+#include "utils/data_type/StringUtils.h"
 #include "utils/Log.h"
 
 ResourceLoader::ResourceLoader(const std::string& projectName)
