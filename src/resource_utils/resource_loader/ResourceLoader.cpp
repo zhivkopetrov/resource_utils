@@ -25,9 +25,9 @@ ResourceLoader::ResourceLoader(const std::string& projectName)
 
 ResourceLoader::~ResourceLoader() { deinit(); }
 
-int32_t ResourceLoader::init(const std::string &projectFolderName,
-                             ResourceLoaderCfg* outCfg) {
-  _projectFolder = projectFolderName + "/";
+int32_t ResourceLoader::init(ResourceLoaderCfg* outCfg) {
+  _projectFolder = _PROJECT_NAME;
+  _projectFolder.append("/");
 
   if (EXIT_SUCCESS != openSourceStreams()) {
     LOGERR("Error in ResourceLoader::openSourceStream() -> Terminating...");
@@ -48,6 +48,7 @@ void ResourceLoader::deinit() { closeSourceStreams(); }
 
 int32_t ResourceLoader::openSourceStreams() {
   int32_t err = EXIT_SUCCESS;
+  LOGR("TODO Fix the ResourceLoader __FILE__");
 
   const std::string absoluteFilePath = __FILE__;
 

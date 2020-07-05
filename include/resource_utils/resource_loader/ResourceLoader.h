@@ -67,7 +67,7 @@ class ResourceLoader {
    *
    *  @returns int32_t - error code
    * */
-  int32_t init(const std::string &projectFolderName, ResourceLoaderCfg* outCfg);
+  int32_t init(ResourceLoaderCfg* outCfg);
 
   /** @brief used to deinitialize the ResourceLoader instance
    * */
