@@ -17,141 +17,35 @@
 #include "utils/data_type/StringUtils.h"
 #include "utils/Log.h"
 
-ResourceLoader::ResourceLoader(const std::string& projectName)
-    : _RESOURCES_BIN_NAME("resources.bin"),
-      _FONTS_BIN_NAME("fonts.bin"),
-      _SOUNDS_BIN_NAME("sounds.bin"),
-      _PROJECT_NAME(projectName) {}
-
-ResourceLoader::~ResourceLoader() { deinit(); }
-
-int32_t ResourceLoader::init(ResourceLoaderCfg* outCfg) {
-  _projectFolder = _PROJECT_NAME;
-  _projectFolder.append("/");
-
-  if (EXIT_SUCCESS != openSourceStreams()) {
-    LOGERR("Error in ResourceLoader::openSourceStream() -> Terminating...");
-
-    return EXIT_FAILURE;
-  }
-
-  if (EXIT_SUCCESS != readEngineBinHeaders(outCfg)) {
-    LOGERR("Error in readEngineBinHeaders() -> Terminating ...");
-
-    return EXIT_FAILURE;
-  }
-
-  return EXIT_SUCCESS;
-}
-
-void ResourceLoader::deinit() { closeSourceStreams(); }
-
-int32_t ResourceLoader::openSourceStreams() {
+int32_t ResourceLoader::init(const std::string &projectBuildPath) {
   int32_t err = EXIT_SUCCESS;
-  LOGR("TODO Fix the ResourceLoader __FILE__");
-
-  const std::string absoluteFilePath = __FILE__;
-
-  // use rfind, because we are closer to the end
-  const uint64_t currDirPos = absoluteFilePath.rfind(_projectFolder);
-
-  std::string resFile = "";
-  std::string fontFile = "";
-  std::string soundFile = "";
-
-  if (std::string::npos != currDirPos) {
-    const std::string projectFilePath =
-        absoluteFilePath.substr(0, currDirPos + _projectFolder.size())
-            .append("build/");
-
-    resFile = projectFilePath;
-    resFile.append(_PROJECT_NAME)
-        .append("/resources/")
-        .append(_RESOURCES_BIN_NAME);
-
-    fontFile = projectFilePath;
-    fontFile.append(_PROJECT_NAME)
-        .append("/resources/")
-        .append(_FONTS_BIN_NAME);
-
-    soundFile = projectFilePath;
-    soundFile.append(_PROJECT_NAME)
-        .append("/resources/")
-        .append(_SOUNDS_BIN_NAME);
-  } else {
-    LOGERR("Error, Engine folder could not be found -> Terminating...");
-
-    err = EXIT_FAILURE;
-  }
-
-  if (EXIT_SUCCESS == err) {
-    _resSourceStream.open(resFile.c_str(),
-                          std::ifstream::in | std::ifstream::binary);
-
-    if (!_resSourceStream) {
-      LOGERR(
-          "Error, could not open ifstream for fileName: %s, "
-          "reason: %s",
-          resFile.c_str(), strerror(errno));
-
-      err = EXIT_FAILURE;
-    }
-  }
-
-  if (EXIT_SUCCESS == err) {
-    _fontsSourceStream.open(fontFile.c_str(),
-                            std::ifstream::in | std::ifstream::binary);
-
-    if (!_fontsSourceStream) {
-      LOGERR(
-          "Error, could not open ifstream for fileName: %s,"
-          " reason: %s",
-          fontFile.c_str(), strerror(errno));
-
-      err = EXIT_FAILURE;
-    }
-  }
-
-  if (EXIT_SUCCESS == err) {
-    _soundsSourceStream.open(soundFile.c_str(),
-                             std::ifstream::in | std::ifstream::binary);
-
-    if (!_soundsSourceStream) {
-      LOGERR(
-          "Error, could not open ifstream for fileName: %s,"
-          " reason: %s",
-          soundFile.c_str(), strerror(errno));
-
-      err = EXIT_FAILURE;
-    }
-  }
-
-  if (EXIT_FAILURE == err) {
-    LOGC(
-        "Developer hint: Run the resourcebuilder tool in the project /build "
-        "directory and make before starting engine");
+  if (EXIT_SUCCESS != openSourceStreams(projectBuildPath)) {
+    LOGERR("Error in ResourceLoader::openSourceStream() -> Terminating...");
+    LOGC("Developer hint: Run the resourcebuilder tool in the project /build "
+         "directory and make before starting engine");
+    return EXIT_FAILURE;
   }
 
   return err;
 }
 
-int32_t ResourceLoader::readEngineBinHeaders(ResourceLoaderCfg* outCfg) {
-  if (EXIT_SUCCESS != readResourceBinHeader(&outCfg->staticWidgetsCount,
-                                            &outCfg->dynamicWidgetsCount,
-                                            &outCfg->widgetsFileSize)) {
+int32_t ResourceLoader::readEngineBinHeaders(EgnineBinHeadersData& outData) {
+  if (EXIT_SUCCESS != readResourceBinHeader(outData.staticWidgetsCount,
+                                            outData.dynamicWidgetsCount,
+                                            outData.widgetsFileSize)) {
     LOGERR("Error in readResourceBinHeader()");
     return EXIT_FAILURE;
   }
 
   if (EXIT_SUCCESS !=
-      readFontBinHeader(&outCfg->fontsCount, &outCfg->fontsFileSize)) {
+      readFontBinHeader(outData.fontsCount, outData.fontsFileSize)) {
     LOGERR("Error in readFontBinHeader()");
     return EXIT_FAILURE;
   }
 
-  if (EXIT_SUCCESS != readSoundBinHeader(&outCfg->musicsCount,
-                                         &outCfg->chunksCount,
-                                         &outCfg->soundsFileSize)) {
+  if (EXIT_SUCCESS != readSoundBinHeader(outData.musicsCount,
+                                         outData.chunksCount,
+                                         outData.soundsFileSize)) {
     LOGERR("Error in readSoundBinHeader()");
     return EXIT_FAILURE;
   }
@@ -159,9 +53,43 @@ int32_t ResourceLoader::readEngineBinHeaders(ResourceLoaderCfg* outCfg) {
   return EXIT_SUCCESS;
 }
 
-int32_t ResourceLoader::readResourceBinHeader(uint64_t* outStaticWidgetsSize,
-                                              uint64_t* outDynamicWidgetsSize,
-                                              int32_t* outWidgetFileSize) {
+int32_t ResourceLoader::openSourceStreams(const std::string &projectBuildPath) {
+  const std::string resFile =
+      projectBuildPath + ResourceFileHeader::getResourceBinName();
+  _resSourceStream.open(resFile.c_str(),
+                        std::ifstream::in | std::ifstream::binary);
+  if (!_resSourceStream) {
+    LOGERR("Error, could not open ifstream for fileName: %s, "
+           "reason: %s", resFile.c_str(), strerror(errno));
+    return EXIT_FAILURE;
+  }
+
+  const std::string fontFile =
+      projectBuildPath + ResourceFileHeader::getFontBinName();
+  _fontsSourceStream.open(fontFile.c_str(),
+                          std::ifstream::in | std::ifstream::binary);
+  if (!_fontsSourceStream) {
+    LOGERR("Error, could not open ifstream for fileName: %s,"
+           " reason: %s", fontFile.c_str(), strerror(errno));
+    return EXIT_FAILURE;
+  }
+
+  const std::string soundFile =
+      projectBuildPath + ResourceFileHeader::getSoundBinName();
+  _soundsSourceStream.open(soundFile.c_str(),
+                           std::ifstream::in | std::ifstream::binary);
+  if (!_soundsSourceStream) {
+    LOGERR("Error, could not open ifstream for fileName: %s,"
+           " reason: %s", soundFile.c_str(), strerror(errno));
+    return EXIT_FAILURE;
+  }
+
+  return EXIT_SUCCESS;
+}
+
+int32_t ResourceLoader::readResourceBinHeader(uint64_t& outStaticWidgetsSize,
+                                              uint64_t& outDynamicWidgetsSize,
+                                              int32_t& outWidgetFileSize) {
   const uint64_t RES_HEADER_SIZE =
       ResourceFileHeader::getEngineResHeader().size();
   const uint64_t ENGINE_RESERVED_SLOT_SIZE =
@@ -178,7 +106,7 @@ int32_t ResourceLoader::readResourceBinHeader(uint64_t* outStaticWidgetsSize,
     return EXIT_FAILURE;
   }
 
-  int32_t parsedArgs = sscanf(line.c_str(), "%lu", outStaticWidgetsSize);
+  int32_t parsedArgs = sscanf(line.c_str(), "%lu", &outStaticWidgetsSize);
   if (1 != parsedArgs) {
     LOGERR("Internal error, sscanf parsed %d arguments instead of 1",
         parsedArgs);
@@ -197,7 +125,7 @@ int32_t ResourceLoader::readResourceBinHeader(uint64_t* outStaticWidgetsSize,
     return EXIT_FAILURE;
   }
 
-  parsedArgs = sscanf(line.c_str(), "%lu", outDynamicWidgetsSize);
+  parsedArgs = sscanf(line.c_str(), "%lu", &outDynamicWidgetsSize);
   if (1 != parsedArgs) {
     LOGERR("Internal error, sscanf parsed %d arguments instead of 1",
         parsedArgs);
@@ -213,7 +141,7 @@ int32_t ResourceLoader::readResourceBinHeader(uint64_t* outStaticWidgetsSize,
     }
   }
 
-  parsedArgs = sscanf(line.c_str(), "%d", outWidgetFileSize);
+  parsedArgs = sscanf(line.c_str(), "%d", &outWidgetFileSize);
   if (1 != parsedArgs) {
     LOGERR("Internal error, sscanf parsed %d arguments instead of 1",
         parsedArgs);
@@ -223,8 +151,8 @@ int32_t ResourceLoader::readResourceBinHeader(uint64_t* outStaticWidgetsSize,
   return EXIT_SUCCESS;
 }
 
-int32_t ResourceLoader::readFontBinHeader(uint64_t* outFontsSize,
-                                          int32_t* outFontsFileSize) {
+int32_t ResourceLoader::readFontBinHeader(uint64_t& outFontsSize,
+                                          int32_t& outFontsFileSize) {
   // move the file pointer to the proper place
   _fontsSourceStream.seekg(ResourceFileHeader::getEngineFontHeader().size(),
                            std::ifstream::beg);
@@ -234,7 +162,7 @@ int32_t ResourceLoader::readFontBinHeader(uint64_t* outFontsSize,
     return EXIT_FAILURE;
   }
 
-  int32_t parsedArgs = sscanf(line.c_str(), "%lu", outFontsSize);
+  int32_t parsedArgs = sscanf(line.c_str(), "%lu", &outFontsSize);
   if (1 != parsedArgs) {
     LOGERR("Internal error, sscanf parsed %d arguments instead of 1",
         parsedArgs);
@@ -250,7 +178,7 @@ int32_t ResourceLoader::readFontBinHeader(uint64_t* outFontsSize,
     }
   }
 
-  parsedArgs = sscanf(line.c_str(), "%d", outFontsFileSize);
+  parsedArgs = sscanf(line.c_str(), "%d", &outFontsFileSize);
   if (1 != parsedArgs) {
     LOGERR("Internal error, sscanf parsed %d arguments instead of 1",
         parsedArgs);
@@ -260,9 +188,9 @@ int32_t ResourceLoader::readFontBinHeader(uint64_t* outFontsSize,
   return EXIT_SUCCESS;
 }
 
-int32_t ResourceLoader::readSoundBinHeader(uint64_t* outMusicsSize,
-                                           uint64_t* outChunksSize,
-                                           int32_t* outSoundsFileSize) {
+int32_t ResourceLoader::readSoundBinHeader(uint64_t& outMusicsSize,
+                                           uint64_t& outChunksSize,
+                                           int32_t& outSoundsFileSize) {
   // move the file pointer to the proper place
   _soundsSourceStream.seekg(ResourceFileHeader::getEngineSoundHeader().size(),
                             std::ifstream::beg);
@@ -273,7 +201,7 @@ int32_t ResourceLoader::readSoundBinHeader(uint64_t* outMusicsSize,
     return EXIT_FAILURE;
   }
 
-  int32_t parsedArgs = sscanf(line.c_str(), "%lu", outMusicsSize);
+  int32_t parsedArgs = sscanf(line.c_str(), "%lu", &outMusicsSize);
   if (1 != parsedArgs) {
     LOGERR("Internal error, sscanf parsed %d arguments instead of 1",
         parsedArgs);
@@ -289,7 +217,7 @@ int32_t ResourceLoader::readSoundBinHeader(uint64_t* outMusicsSize,
     }
   }
 
-  parsedArgs = sscanf(line.c_str(), "%lu", outChunksSize);
+  parsedArgs = sscanf(line.c_str(), "%lu", &outChunksSize);
   if (1 != parsedArgs) {
     LOGERR("Internal error, sscanf parsed %d arguments instead of 1",
         parsedArgs);
@@ -305,7 +233,7 @@ int32_t ResourceLoader::readSoundBinHeader(uint64_t* outMusicsSize,
     }
   }
 
-  parsedArgs = sscanf(line.c_str(), "%d", outSoundsFileSize);
+  parsedArgs = sscanf(line.c_str(), "%d", &outSoundsFileSize);
   if (1 != parsedArgs) {
     LOGERR("Internal error, sscanf parsed %d arguments instead of 1",
         parsedArgs);
@@ -330,7 +258,7 @@ void ResourceLoader::closeSourceStreams() {
 }
 
 bool ResourceLoader::readChunkHeaderInternal(
-    const ResourceDefines::FieldType fieldType, DataHeader* outData) {
+    const ResourceDefines::FieldType fieldType, DataHeader& outData) {
   constexpr int32_t HEADER_SIZE = 3;
   std::string lines[HEADER_SIZE];
 
@@ -356,20 +284,20 @@ bool ResourceLoader::readChunkHeaderInternal(
   }
 
   std::stringstream str(lines[0]);
-  str >> std::hex >> outData->hashValue;
+  str >> std::hex >> outData.hashValue;
 
-  outData->path = lines[1];
+  outData.path = lines[1];
 
-  outData->fileSize = StringUtils::safeStoi(lines[2]);
+  outData.fileSize = StringUtils::safeStoi(lines[2]);
 
   return true;
 }
 
-bool ResourceLoader::readResourceChunk(ResourceData* outData) {
+bool ResourceLoader::readResourceChunk(ResourceData& outData) {
   // for now it doesn't matter if we use FieldType::IMAGE or FieldType::SPRITE,
   // because they both have the same headers
   if (!readChunkHeaderInternal(ResourceDefines::FieldType::SPRITE,
-                               &outData->header)) {
+                               outData.header)) {
     return false;
   }
 
@@ -382,7 +310,7 @@ bool ResourceLoader::readResourceChunk(ResourceData* outData) {
     }
   }
 
-  outData->textureLoadType = StringUtils::safeStoi(lines[0]);
+  outData.textureLoadType = StringUtils::safeStoi(lines[0]);
 
   std::vector<int32_t> coordsData;
   if (EXIT_SUCCESS !=
@@ -391,14 +319,14 @@ bool ResourceLoader::readResourceChunk(ResourceData* outData) {
     return false;
   }
 
-  outData->imageRect.x = coordsData[0];
-  outData->imageRect.y = coordsData[1];
-  outData->imageRect.w = coordsData[2];
-  outData->imageRect.h = coordsData[3];
+  outData.imageRect.x = coordsData[0];
+  outData.imageRect.y = coordsData[1];
+  outData.imageRect.w = coordsData[2];
+  outData.imageRect.h = coordsData[3];
 
   const int32_t SPRITE_COUNT = StringUtils::safeStoi(lines[2]);
 
-  outData->spriteData.reserve(SPRITE_COUNT);
+  outData.spriteData.reserve(SPRITE_COUNT);
 
   std::vector<int32_t> spriteData;
   for (int32_t i = 0; i < SPRITE_COUNT; ++i) {
@@ -413,10 +341,10 @@ bool ResourceLoader::readResourceChunk(ResourceData* outData) {
       return false;
     }
 
-    outData->spriteData.emplace_back(spriteData[0],   // x
-                                     spriteData[1],   // y
-                                     spriteData[2],   // w
-                                     spriteData[3]);  // h
+    outData.spriteData.emplace_back(spriteData[0],   // x
+                                    spriteData[1],   // y
+                                    spriteData[2],   // w
+                                    spriteData[3]);  // h
 
     // clear vector so we can reuse it
     spriteData.clear();
@@ -425,9 +353,9 @@ bool ResourceLoader::readResourceChunk(ResourceData* outData) {
   return true;
 }
 
-bool ResourceLoader::readFontChunk(FontData* outData) {
+bool ResourceLoader::readFontChunk(FontData& outData) {
   if (!readChunkHeaderInternal(ResourceDefines::FieldType::FONT,
-                               &outData->header)) {
+                               outData.header)) {
     return false;
   }
 
@@ -436,14 +364,14 @@ bool ResourceLoader::readFontChunk(FontData* outData) {
     return false;
   }
 
-  outData->fontSize = StringUtils::safeStoi(singleLine);
+  outData.fontSize = StringUtils::safeStoi(singleLine);
 
   return true;
 }
 
-bool ResourceLoader::readSoundChunk(SoundData* outData) {
+bool ResourceLoader::readSoundChunk(SoundData& outData) {
   if (!readChunkHeaderInternal(ResourceDefines::FieldType::SOUND,
-                               &outData->header)) {
+                               outData.header)) {
     return false;
   }
 
@@ -457,34 +385,36 @@ bool ResourceLoader::readSoundChunk(SoundData* outData) {
   }
 
   if ("chunk" == lines[0]) {
-    outData->soundType = SoundType::CHUNK;
+    outData.soundType = SoundType::CHUNK;
   } else if ("music" == lines[0]) {
-    outData->soundType = SoundType::MUSIC;
+    outData.soundType = SoundType::MUSIC;
   } else {
     LOGERR(
         "Error wrong description in file: %s, with tag: %s. Second "
         "argument must be 'music' or 'chunk'",
-        _SOUNDS_BIN_NAME.c_str(), outData->header.path.c_str());
+        ResourceFileHeader::getSoundBinName().c_str(),
+        outData.header.path.c_str());
 
-    outData->soundType = SoundType::UNKNOWN;
+    outData.soundType = SoundType::UNKNOWN;
     return false;
   }
 
   if ("low" == lines[1]) {
-    outData->soundLevel = SoundLevel::LOW;
+    outData.soundLevel = SoundLevel::LOW;
   } else if ("medium" == lines[1]) {
-    outData->soundLevel = SoundLevel::MEDIUM;
+    outData.soundLevel = SoundLevel::MEDIUM;
   } else if ("high" == lines[1]) {
-    outData->soundLevel = SoundLevel::HIGH;
+    outData.soundLevel = SoundLevel::HIGH;
   } else if ("very_high" == lines[1]) {
-    outData->soundLevel = SoundLevel::VERY_HIGH;
+    outData.soundLevel = SoundLevel::VERY_HIGH;
   } else {
     LOGERR(
         "Error wrong description in file: %s, with tag: %s. "
         "Third argument must be 'low', 'medium', 'high' or 'very_high'",
-        _SOUNDS_BIN_NAME.c_str(), outData->header.path.c_str());
+        ResourceFileHeader::getSoundBinName().c_str(),
+        outData.header.path.c_str());
 
-    outData->soundLevel = SoundLevel::UNKNOWN;
+    outData.soundLevel = SoundLevel::UNKNOWN;
     return false;
   }
 

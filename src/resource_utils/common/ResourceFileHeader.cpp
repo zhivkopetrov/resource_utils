@@ -62,3 +62,15 @@ std::string ResourceFileHeader::getResourceFileHeader() {
          "/* Resource Builder Tool version 1.0 */\n"
          "/* Author: Zhivko Petrov */\n\n";
 }
+
+std::string ResourceFileHeader::getResourceBinName() {
+  return "resources.bin";
+}
+
+std::string ResourceFileHeader::getFontBinName() {
+  return "fonts.bin";
+}
+
+std::string ResourceFileHeader::getSoundBinName() {
+  return "sounds.bin";
+}

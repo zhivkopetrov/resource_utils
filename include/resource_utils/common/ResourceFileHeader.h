@@ -81,6 +81,14 @@ class ResourceFileHeader {
    *  @returns std::string - the game text header
    * */
   static std::string getResourceFileHeader();
+
+  /** @brief contains name of the global generated resource/font/sound files
+   *
+   *  @return sdtd::string - resource/font/sound bin file names
+   * */
+  static std::string getResourceBinName();
+  static std::string getFontBinName();
+  static std::string getSoundBinName();
 };
 
 #endif /* RESOURCE_UTILS_RESOURCEFILEHEADER_H_ */

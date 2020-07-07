@@ -21,150 +21,125 @@ struct DataHeader;
 enum class FieldType : uint8_t;
 
 /** @brief used for containing all resources/fonts/sounds listed in
- *         _RESOURCES_BIN_NAME, _FONTS_BIN_NAME and _SOUNDS_BIN_NAME at
+ *         for resource/font/sounds bin files at
  *         project start up and set the total count of widgets/fonts/sounds.
  *
- *  @param uint64_t * - total widgets count
- *  @param uint64_t * - total fonts count
- *  @param uint64_t * - total musics count
- *  @param uint64_t * - total sound chunks count
- *  @param int32_t *  - total widgets file size
- *  @param int32_t *  - total fonts file size
- *  @param int32_t *  - total sounds file size
+ *  @param uint64_t - total widgets count
+ *  @param uint64_t - total fonts count
+ *  @param uint64_t - total musics count
+ *  @param uint64_t - total sound chunks count
+ *  @param int32_t  - total widgets file size
+ *  @param int32_t  - total fonts file size
+ *  @param int32_t  - total sounds file size
  *  */
-struct ResourceLoaderCfg {
-  ResourceLoaderCfg() { reset(); }
-
-  void reset() {
-    staticWidgetsCount = 0;
-    dynamicWidgetsCount = 0;
-    fontsCount = 0;
-    musicsCount = 0;
-    chunksCount = 0;
-    widgetsFileSize = 0;
-    fontsFileSize = 0;
-    soundsFileSize = 0;
-  }
-
-  uint64_t staticWidgetsCount;
-  uint64_t dynamicWidgetsCount;
-  uint64_t fontsCount;
-  uint64_t musicsCount;
-  uint64_t chunksCount;
-  int32_t widgetsFileSize;
-  int32_t fontsFileSize;
-  int32_t soundsFileSize;
+struct EgnineBinHeadersData {
+  uint64_t staticWidgetsCount = 0;
+  uint64_t dynamicWidgetsCount = 0;
+  uint64_t fontsCount = 0;
+  uint64_t musicsCount = 0;
+  uint64_t chunksCount = 0;
+  int32_t widgetsFileSize = 0;
+  int32_t fontsFileSize = 0;
+  int32_t soundsFileSize = 0;
 };
 
 class ResourceLoader {
  public:
-  ResourceLoader() = delete;
-
-  explicit ResourceLoader(const std::string& projectName);
-  ~ResourceLoader();
-
-  /** @brief used to load and populate the ResourceLoaderCfg
+  /** @brief used to initialize the ResourceLoader internal streams
    *
    *  @returns int32_t - error code
    * */
-  int32_t init(ResourceLoaderCfg* outCfg);
+  int32_t init(const std::string &projectBuildPath);
 
-  /** @brief used to deinitialize the ResourceLoader instance
-   * */
-  void deinit();
-
-  /** @brief used to parse single resource from _RESOURCES_BIN_NAME
+  /** @brief used to load and populate the EgnineBinHeadersData
    *
-   *  @param ResourceData * - fully parsed ResourceData chunk
+   *  @returns int32_t - error code
+   * */
+  int32_t readEngineBinHeaders(EgnineBinHeadersData& outData);
+
+  /** @brief used to parse single resource from resource bin file
+   *
+   *  @param ResourceData & - fully parsed ResourceData chunk
    *
    *  @return bool          - successful read or not
    *
    *                 NOTE: unsuccessful read means
-   *                                _RESOURCES_BIN_NAME.eof() is reached.
+   *                                resource bin file.eof() is reached.
    * */
-  bool readResourceChunk(ResourceData* outData);
+  bool readResourceChunk(ResourceData& outData);
 
-  /** @brief used to parse single resource from _FONTS_BIN_NAME
+  /** @brief used to parse single resource from fonts bin file
    *
-   *  @param ResourceData* - fully parsed FontData chunk
+   *  @param ResourceData& - fully parsed FontData chunk
    *
    *  @return bool - successful read or not
    *                 NOTE: unsuccessful read means
-   *                                    _FONTS_BIN_NAME.eof() is reached.
+   *                                    fonts bin file.eof() is reached.
    * */
-  bool readFontChunk(FontData* outData);
+  bool readFontChunk(FontData& outData);
 
-  /** @brief used to parse single resource from _SOUNDS_BIN_NAME
+  /** @brief used to parse single resource from sound bin file
    *
    *  @param ResourceData * - fully parsed SoundData chunk
    *
    *  @return bool          - successful read or not
    *
    *                 NOTE: unsuccessful read means
-   *                                    _SOUNDS_BIN_NAME.eof() is reached.
+   *                                    sound bin file.eof() is reached.
    * */
-  bool readSoundChunk(SoundData* outData);
+  bool readSoundChunk(SoundData& outData);
 
  private:
-  /** @brief used to open file streams for
-   *            _RESOURCES_BIN_NAME, _FONTS_BIN_NAME and _SOUNDS_BIN_NAME
+  /** @brief used to open file streams for resource/font/sounds bin files
    *
    *  @returns int32_t - error code
    * */
-  int32_t openSourceStreams();
+  int32_t openSourceStreams(const std::string &projectBuildPath);
 
-  /** @brief used to close file streams for
-   *            _RESOURCES_BIN_NAME, _FONTS_BIN_NAME and _SOUNDS_BIN_NAME
+  /** @brief used to close file streams for resource/font/sounds bin files
    * */
   void closeSourceStreams();
 
-  /** @brief used to load and populate the ResourceLoaderCfg
-   *
-   *  @returns int32_t - error code
-   * */
-  int32_t readEngineBinHeaders(ResourceLoaderCfg* outCfg);
-
   /** @brief used to read  total count of widgets
-   *         and their respective file size from  _RESOURCES_BIN_NAME
+   *         and their respective file size from resource bin file
    *
-   *  @param uint64_t * - total static widgets count
-   *  @param uint64_t * - total dynamic widgets count
-   *  @param int32_t *  - total widgets file size
+   *  @param uint64_t & - total static widgets count
+   *  @param uint64_t & - total dynamic widgets count
+   *  @param int32_t &  - total widgets file size
    *
    *  @returns int32_t  - error code
    * */
-  int32_t readResourceBinHeader(uint64_t* outStaticWidgetsSize,
-                                uint64_t* outDynamicWidgetsSize,
-                                int32_t* outWidgetFileSize);
+  int32_t readResourceBinHeader(uint64_t& outStaticWidgetsSize,
+                                uint64_t& outDynamicWidgetsSize,
+                                int32_t& outWidgetFileSize);
 
   /** @brief used to read  total count of fonts
-   *         and their respective file size from  _FONTS_BIN_NAME
+   *         and their respective file size from fond bin file
    *
    *  @param uint64_t * - total fonts count
    *  @param int32_t *  - total fonts file size
    *
    *  @returns int32_t  - error code
    * */
-  int32_t readFontBinHeader(uint64_t* outFontsSize, int32_t* outFontsFileSize);
+  int32_t readFontBinHeader(uint64_t& outFontsSize, int32_t& outFontsFileSize);
 
   /** @brief used to read  total count of musics and sound chunks
-   *         and their respective file size from  _SOUNDS_BIN_NAME
+   *         and their respective file size from sound bin file
    *
-   *  @param uint64_t * - total musics count
-   *  @param uint64_t * - total sound chunks count
-   *  @param int32_t *  - total sounds file size
+   *  @param uint64_t & - total musics count
+   *  @param uint64_t & - total sound chunks count
+   *  @param int32_t &  - total sounds file size
    *
    *  @returns int32_t  - error code
    * */
-  int32_t readSoundBinHeader(uint64_t* outMusicsSize, uint64_t* outChunksSize,
-                             int32_t* outSoundsFileSize);
+  int32_t readSoundBinHeader(uint64_t& outMusicsSize, uint64_t& outChunksSize,
+                             int32_t& outSoundsFileSize);
 
   /** @brief used to parse single DataHeader from
-   *         _RESOURCES_BIN_NAME, _FONTS_BIN_NAME and _SOUNDS_BIN_NAME
-   *                                          (they share common header).
+   *         resource/font/sounds bin files (they share common header).
    *
    *  @param const FieldType - IMAGE, SPRITE or FONT
-   *  @param DataHeader *    - fully parsed DataHeader chunk
+   *  @param DataHeader &    - fully parsed DataHeader chunk
    *
    *  @return bool           - successful read or not
    *
@@ -172,22 +147,7 @@ class ResourceLoader {
    *                                destinationStream.eof() is reached.
    * */
   bool readChunkHeaderInternal(const ResourceDefines::FieldType fieldType,
-                               DataHeader* outData);
-
-  // Hold the name of the project resource file
-  const std::string _RESOURCES_BIN_NAME;
-
-  // Hold the name of the project font file
-  const std::string _FONTS_BIN_NAME;
-
-  // Hold the name of the project font file
-  const std::string _SOUNDS_BIN_NAME;
-
-  // Holds the name of the current project folder
-  const std::string _PROJECT_NAME;
-
-  // Holds the name of the root project folder
-  std::string _projectFolder;
+                               DataHeader& outData);
 
   // Input file stream for the project resource file
   std::ifstream _resSourceStream;
