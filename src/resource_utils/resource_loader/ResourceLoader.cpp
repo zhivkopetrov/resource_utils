@@ -17,9 +17,9 @@
 #include "utils/data_type/StringUtils.h"
 #include "utils/Log.h"
 
-int32_t ResourceLoader::init(const std::string &projectBuildPath) {
+int32_t ResourceLoader::init(const std::string &resourcesBinLocation) {
   int32_t err = EXIT_SUCCESS;
-  if (EXIT_SUCCESS != openSourceStreams(projectBuildPath)) {
+  if (EXIT_SUCCESS != openSourceStreams(resourcesBinLocation)) {
     LOGERR("Error in ResourceLoader::openSourceStream() -> Terminating...");
     LOGC("Developer hint: Run the resourcebuilder tool in the project /build "
          "directory and make before starting engine");
@@ -53,9 +53,10 @@ int32_t ResourceLoader::readEngineBinHeaders(EgnineBinHeadersData& outData) {
   return EXIT_SUCCESS;
 }
 
-int32_t ResourceLoader::openSourceStreams(const std::string &projectBuildPath) {
+int32_t ResourceLoader::openSourceStreams(
+    const std::string &resourcesBinLocation) {
   const std::string resFile =
-      projectBuildPath + ResourceFileHeader::getResourceBinName();
+      resourcesBinLocation + ResourceFileHeader::getResourceBinName();
   _resSourceStream.open(resFile.c_str(),
                         std::ifstream::in | std::ifstream::binary);
   if (!_resSourceStream) {
@@ -65,7 +66,7 @@ int32_t ResourceLoader::openSourceStreams(const std::string &projectBuildPath) {
   }
 
   const std::string fontFile =
-      projectBuildPath + ResourceFileHeader::getFontBinName();
+      resourcesBinLocation + ResourceFileHeader::getFontBinName();
   _fontsSourceStream.open(fontFile.c_str(),
                           std::ifstream::in | std::ifstream::binary);
   if (!_fontsSourceStream) {
@@ -75,7 +76,7 @@ int32_t ResourceLoader::openSourceStreams(const std::string &projectBuildPath) {
   }
 
   const std::string soundFile =
-      projectBuildPath + ResourceFileHeader::getSoundBinName();
+      resourcesBinLocation + ResourceFileHeader::getSoundBinName();
   _soundsSourceStream.open(soundFile.c_str(),
                            std::ifstream::in | std::ifstream::binary);
   if (!_soundsSourceStream) {

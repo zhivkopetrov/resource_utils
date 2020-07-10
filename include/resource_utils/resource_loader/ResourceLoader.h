@@ -49,7 +49,7 @@ class ResourceLoader {
    *
    *  @returns int32_t - error code
    * */
-  int32_t init(const std::string &projectBuildPath);
+  int32_t init(const std::string &resourcesBinLocation);
 
   /** @brief used to load and populate the EgnineBinHeadersData
    *
@@ -94,7 +94,7 @@ class ResourceLoader {
    *
    *  @returns int32_t - error code
    * */
-  int32_t openSourceStreams(const std::string &projectBuildPath);
+  int32_t openSourceStreams(const std::string &resourcesBinLocation);
 
   /** @brief used to close file streams for resource/font/sounds bin files
    * */

@@ -89,6 +89,7 @@ class ResourceFileHeader {
   static std::string getResourceBinName();
   static std::string getFontBinName();
   static std::string getSoundBinName();
+  static std::string getResourcesBinFolderName();
 };
 
 #endif /* RESOURCE_UTILS_RESOURCEFILEHEADER_H_ */

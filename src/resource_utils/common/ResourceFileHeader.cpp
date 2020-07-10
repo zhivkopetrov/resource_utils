@@ -74,3 +74,7 @@ std::string ResourceFileHeader::getFontBinName() {
 std::string ResourceFileHeader::getSoundBinName() {
   return "sounds.bin";
 }
+
+std::string ResourceFileHeader::getResourcesBinFolderName() {
+  return "resources";
+}
