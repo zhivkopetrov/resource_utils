@@ -15,42 +15,42 @@
 #include "resource_utils/structs/SoundData.h"
 #include "resource_utils/common/ResourceFileHeader.h"
 #include "utils/data_type/StringUtils.h"
+#include "utils/ErrorCode.h"
 #include "utils/Log.h"
 
 int32_t ResourceLoader::init(const std::string &resourcesBinLocation) {
-  int32_t err = EXIT_SUCCESS;
-  if (EXIT_SUCCESS != openSourceStreams(resourcesBinLocation)) {
+  if (SUCCESS != openSourceStreams(resourcesBinLocation)) {
     LOGERR("Error in ResourceLoader::openSourceStream() -> Terminating...");
     LOGC("Developer hint: Run the resourcebuilder tool in the project /build "
          "directory and make before starting engine");
-    return EXIT_FAILURE;
+    return FAILURE;
   }
 
-  return err;
+  return SUCCESS;
 }
 
 int32_t ResourceLoader::readEngineBinHeaders(EgnineBinHeadersData& outData) {
-  if (EXIT_SUCCESS != readResourceBinHeader(outData.staticWidgetsCount,
+  if (SUCCESS != readResourceBinHeader(outData.staticWidgetsCount,
                                             outData.dynamicWidgetsCount,
                                             outData.widgetsFileSize)) {
     LOGERR("Error in readResourceBinHeader()");
-    return EXIT_FAILURE;
+    return FAILURE;
   }
 
-  if (EXIT_SUCCESS !=
+  if (SUCCESS !=
       readFontBinHeader(outData.fontsCount, outData.fontsFileSize)) {
     LOGERR("Error in readFontBinHeader()");
-    return EXIT_FAILURE;
+    return FAILURE;
   }
 
-  if (EXIT_SUCCESS != readSoundBinHeader(outData.musicsCount,
+  if (SUCCESS != readSoundBinHeader(outData.musicsCount,
                                          outData.chunksCount,
                                          outData.soundsFileSize)) {
     LOGERR("Error in readSoundBinHeader()");
-    return EXIT_FAILURE;
+    return FAILURE;
   }
 
-  return EXIT_SUCCESS;
+  return SUCCESS;
 }
 
 int32_t ResourceLoader::openSourceStreams(
@@ -62,7 +62,7 @@ int32_t ResourceLoader::openSourceStreams(
   if (!_resSourceStream) {
     LOGERR("Error, could not open ifstream for fileName: %s, "
            "reason: %s", resFile.c_str(), strerror(errno));
-    return EXIT_FAILURE;
+    return FAILURE;
   }
 
   const std::string fontFile =
@@ -72,7 +72,7 @@ int32_t ResourceLoader::openSourceStreams(
   if (!_fontsSourceStream) {
     LOGERR("Error, could not open ifstream for fileName: %s,"
            " reason: %s", fontFile.c_str(), strerror(errno));
-    return EXIT_FAILURE;
+    return FAILURE;
   }
 
   const std::string soundFile =
@@ -82,10 +82,10 @@ int32_t ResourceLoader::openSourceStreams(
   if (!_soundsSourceStream) {
     LOGERR("Error, could not open ifstream for fileName: %s,"
            " reason: %s", soundFile.c_str(), strerror(errno));
-    return EXIT_FAILURE;
+    return FAILURE;
   }
 
-  return EXIT_SUCCESS;
+  return SUCCESS;
 }
 
 int32_t ResourceLoader::readResourceBinHeader(uint64_t& outStaticWidgetsSize,
@@ -104,14 +104,14 @@ int32_t ResourceLoader::readResourceBinHeader(uint64_t& outStaticWidgetsSize,
   std::string line = "";
   if (!std::getline(_resSourceStream, line)) {
     LOGERR("Internal error, Could not parse widgetsCount");
-    return EXIT_FAILURE;
+    return FAILURE;
   }
 
   int32_t parsedArgs = sscanf(line.c_str(), "%lu", &outStaticWidgetsSize);
   if (1 != parsedArgs) {
     LOGERR("Internal error, sscanf parsed %d arguments instead of 1",
         parsedArgs);
-    return EXIT_FAILURE;
+    return FAILURE;
   }
 
   const uint64_t OFFSET = RES_HEADER_SIZE + ENGINE_RESERVED_SLOT_SIZE +
@@ -123,14 +123,14 @@ int32_t ResourceLoader::readResourceBinHeader(uint64_t& outStaticWidgetsSize,
 
   if (!std::getline(_resSourceStream, line)) {
     LOGERR("Internal error, Could not parse widgetsCount");
-    return EXIT_FAILURE;
+    return FAILURE;
   }
 
   parsedArgs = sscanf(line.c_str(), "%lu", &outDynamicWidgetsSize);
   if (1 != parsedArgs) {
     LOGERR("Internal error, sscanf parsed %d arguments instead of 1",
         parsedArgs);
-    return EXIT_FAILURE;
+    return FAILURE;
   }
 
   // 3, because we expect 1 newline + 1 line of resource file size header
@@ -138,7 +138,7 @@ int32_t ResourceLoader::readResourceBinHeader(uint64_t& outStaticWidgetsSize,
   for (int32_t i = 0; i < 3; ++i) {
     if (!std::getline(_resSourceStream, line)) {
       LOGERR("Internal error, not enough data");
-      return EXIT_FAILURE;
+      return FAILURE;
     }
   }
 
@@ -146,10 +146,10 @@ int32_t ResourceLoader::readResourceBinHeader(uint64_t& outStaticWidgetsSize,
   if (1 != parsedArgs) {
     LOGERR("Internal error, sscanf parsed %d arguments instead of 1",
         parsedArgs);
-    return EXIT_FAILURE;
+    return FAILURE;
   }
 
-  return EXIT_SUCCESS;
+  return SUCCESS;
 }
 
 int32_t ResourceLoader::readFontBinHeader(uint64_t& outFontsSize,
@@ -160,14 +160,14 @@ int32_t ResourceLoader::readFontBinHeader(uint64_t& outFontsSize,
   std::string line = "";
   if (!std::getline(_fontsSourceStream, line)) {
     LOGERR("Internal error, Could not parse fontsCount");
-    return EXIT_FAILURE;
+    return FAILURE;
   }
 
   int32_t parsedArgs = sscanf(line.c_str(), "%lu", &outFontsSize);
   if (1 != parsedArgs) {
     LOGERR("Internal error, sscanf parsed %d arguments instead of 1",
         parsedArgs);
-    return EXIT_FAILURE;
+    return FAILURE;
   }
 
   // 3, because we expect 1 newline + 1 line of fonts file size header
@@ -175,7 +175,7 @@ int32_t ResourceLoader::readFontBinHeader(uint64_t& outFontsSize,
   for (int32_t i = 0; i < 3; ++i) {
     if (!std::getline(_fontsSourceStream, line)) {
       LOGERR("Internal error, not enough data");
-      return EXIT_FAILURE;
+      return FAILURE;
     }
   }
 
@@ -183,10 +183,10 @@ int32_t ResourceLoader::readFontBinHeader(uint64_t& outFontsSize,
   if (1 != parsedArgs) {
     LOGERR("Internal error, sscanf parsed %d arguments instead of 1",
         parsedArgs);
-    return EXIT_FAILURE;
+    return FAILURE;
   }
 
-  return EXIT_SUCCESS;
+  return SUCCESS;
 }
 
 int32_t ResourceLoader::readSoundBinHeader(uint64_t& outMusicsSize,
@@ -199,14 +199,14 @@ int32_t ResourceLoader::readSoundBinHeader(uint64_t& outMusicsSize,
   std::string line = "";
   if (!std::getline(_soundsSourceStream, line)) {
     LOGERR("Internal error, Could not parse soundsCount");
-    return EXIT_FAILURE;
+    return FAILURE;
   }
 
   int32_t parsedArgs = sscanf(line.c_str(), "%lu", &outMusicsSize);
   if (1 != parsedArgs) {
     LOGERR("Internal error, sscanf parsed %d arguments instead of 1",
         parsedArgs);
-    return EXIT_FAILURE;
+    return FAILURE;
   }
 
   // 3, because we expect 1 newline + 1 line of file sound addition header
@@ -214,7 +214,7 @@ int32_t ResourceLoader::readSoundBinHeader(uint64_t& outMusicsSize,
   for (int32_t i = 0; i < 3; ++i) {
     if (!std::getline(_soundsSourceStream, line)) {
       LOGERR("Internal error, not enough data");
-      return EXIT_FAILURE;
+      return FAILURE;
     }
   }
 
@@ -222,7 +222,7 @@ int32_t ResourceLoader::readSoundBinHeader(uint64_t& outMusicsSize,
   if (1 != parsedArgs) {
     LOGERR("Internal error, sscanf parsed %d arguments instead of 1",
         parsedArgs);
-    return EXIT_FAILURE;
+    return FAILURE;
   }
 
   // 3, because we expect 1 newline + 1 line of sound file size header
@@ -230,7 +230,7 @@ int32_t ResourceLoader::readSoundBinHeader(uint64_t& outMusicsSize,
   for (int32_t i = 0; i < 3; ++i) {
     if (!std::getline(_soundsSourceStream, line)) {
       LOGERR("Internal error, not enough data");
-      return EXIT_FAILURE;
+      return FAILURE;
     }
   }
 
@@ -238,10 +238,10 @@ int32_t ResourceLoader::readSoundBinHeader(uint64_t& outMusicsSize,
   if (1 != parsedArgs) {
     LOGERR("Internal error, sscanf parsed %d arguments instead of 1",
         parsedArgs);
-    return EXIT_FAILURE;
+    return FAILURE;
   }
 
-  return EXIT_SUCCESS;
+  return SUCCESS;
 }
 
 void ResourceLoader::closeSourceStreams() {
@@ -314,7 +314,7 @@ bool ResourceLoader::readResourceChunk(ResourceData& outData) {
   outData.textureLoadType = StringUtils::safeStoi(lines[0]);
 
   std::vector<int32_t> coordsData;
-  if (EXIT_SUCCESS !=
+  if (SUCCESS !=
       StringUtils::extractIntsFromString(lines[1], " ", &coordsData, 4)) {
     LOGERR("Internal error, not valid coordsData");
     return false;
@@ -336,7 +336,7 @@ bool ResourceLoader::readResourceChunk(ResourceData& outData) {
       return false;
     }
 
-    if (EXIT_SUCCESS !=
+    if (SUCCESS !=
         StringUtils::extractIntsFromString(lines[0], " ", &spriteData, 4)) {
       LOGERR("Internal error, not valid sprite data");
       return false;
