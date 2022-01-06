@@ -12,21 +12,21 @@ endif()
 
 project(resource_utils)
    
-set(_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/resource_utils)
+set(_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/resource_utils)
 set(_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 add_library(
     ${PROJECT_NAME} 
     STATIC
-        ${_INCLUDE_DIR}/common/ResourceFileHeader.h
-        ${_INCLUDE_DIR}/defines/ResourceDefines.h
-        ${_INCLUDE_DIR}/defines/SoundDefines.h
-        ${_INCLUDE_DIR}/resource_loader/ResourceLoader.h
-        ${_INCLUDE_DIR}/structs/CombinedStructs.h
-        ${_INCLUDE_DIR}/structs/DataHeader.h
-        ${_INCLUDE_DIR}/structs/FontData.h
-        ${_INCLUDE_DIR}/structs/ResourceData.h
-        ${_INCLUDE_DIR}/structs/SoundData.h
+        ${_INC_DIR}/common/ResourceFileHeader.h
+        ${_INC_DIR}/defines/ResourceDefines.h
+        ${_INC_DIR}/defines/SoundDefines.h
+        ${_INC_DIR}/resource_loader/ResourceLoader.h
+        ${_INC_DIR}/structs/CombinedStructs.h
+        ${_INC_DIR}/structs/DataHeader.h
+        ${_INC_DIR}/structs/FontData.h
+        ${_INC_DIR}/structs/ResourceData.h
+        ${_INC_DIR}/structs/SoundData.h
         
         ${_SRC_DIR}/common/ResourceFileHeader.cpp
         ${_SRC_DIR}/defines/SoundDefines.cpp
