@@ -8,10 +8,10 @@
 #include <vector>
 
 // Other libraries headers
+#include "utils/drawing/Rectangle.h"
 
 // Own components headers
 #include "resource_utils/structs/DataHeader.h"
-#include "utils/drawing/Rectangle.h"
 
 // Forward declarations
 

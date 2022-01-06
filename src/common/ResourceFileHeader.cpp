@@ -6,9 +6,9 @@
 // C++ system headers
 
 // Other libraries headers
+#include "utils/LimitValues.h"
 
 // Own components headers
-#include "utils/LimitValues.hpp"
 
 std::string ResourceFileHeader::getEngineResHeader() {
   return "# This file is auto-generated. Do not modify it. \n\n"

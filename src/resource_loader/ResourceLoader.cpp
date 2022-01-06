@@ -8,15 +8,15 @@
 #include <sstream>
 
 // Other libraries headers
+#include "utils/data_type/StringUtils.h"
+#include "utils/ErrorCode.h"
+#include "utils/Log.h"
 
 // Own components headers
 #include "resource_utils/structs/ResourceData.h"
 #include "resource_utils/structs/FontData.h"
 #include "resource_utils/structs/SoundData.h"
 #include "resource_utils/common/ResourceFileHeader.h"
-#include "utils/data_type/StringUtils.h"
-#include "utils/ErrorCode.h"
-#include "utils/Log.h"
 
 int32_t ResourceLoader::init(const std::string &resourcesBinLocation) {
   if (SUCCESS != openSourceStreams(resourcesBinLocation)) {
