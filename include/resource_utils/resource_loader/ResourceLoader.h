@@ -49,7 +49,7 @@ class ResourceLoader {
    *
    *  @returns int32_t - error code
    * */
-  int32_t init(const std::string &resourcesBinLocation);
+  int32_t init(const std::string &resourcesFolderLocation);
 
   /** @brief used to load and populate the EgnineBinHeadersData
    *
