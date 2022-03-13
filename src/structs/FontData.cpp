@@ -1,9 +1,7 @@
 // Corresponding header
 #include "resource_utils/structs/FontData.h"
 
-// C system headers
-
-// C++ system headers
+// System headers
 
 // Other libraries headers
 

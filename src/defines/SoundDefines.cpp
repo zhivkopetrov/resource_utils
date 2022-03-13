@@ -1,9 +1,7 @@
 // Corresponding header
 #include "resource_utils/defines/SoundDefines.h"
 
-// C system headers
-
-// C++ system headers
+// System headers
 
 // Other libraries headers
 

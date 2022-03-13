@@ -1,14 +1,14 @@
 #ifndef RESOURCE_UTILS_RESOURCEDEFINES_H_
 #define RESOURCE_UTILS_RESOURCEDEFINES_H_
 
-// C system headers
-
-// C++ system headers
+// System headers
 #include <cstdint>
 
 // Other libraries headers
 
 // Own components headers
+
+// Forward declarations
 
 namespace ResourceDefines {
 enum class FieldType : uint8_t {

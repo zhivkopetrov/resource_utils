@@ -1,15 +1,15 @@
 #ifndef RESOURCE_UTILS_RESOURCEFILEHEADER_H_
 #define RESOURCE_UTILS_RESOURCEFILEHEADER_H_
 
-// C system headers
-
-// C++ system headers
+// System headers
 #include <cstdint>
 #include <string>
 
 // Other libraries headers
 
 // Own components headers
+
+// Forward declarations
 
 class ResourceFileHeader {
  public:

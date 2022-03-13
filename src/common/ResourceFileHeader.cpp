@@ -1,9 +1,7 @@
 // Corresponding header
 #include "resource_utils/common/ResourceFileHeader.h"
 
-// C system headers
-
-// C++ system headers
+// System headers
 
 // Other libraries headers
 #include "utils/LimitValues.h"

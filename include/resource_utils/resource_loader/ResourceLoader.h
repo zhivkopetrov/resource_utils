@@ -1,14 +1,13 @@
 #ifndef RESOURCE_UTILS_RESOURCELOADER_H_
 #define RESOURCE_UTILS_RESOURCELOADER_H_
 
-// C system headers
-
-// C++ system headers
+// System headers
 #include <cstdint>
 #include <fstream>
 #include <string>
 
 // Other libraries headers
+#include "utils/ErrorCode.h"
 
 // Own components headers
 #include "resource_utils/defines/ResourceDefines.h"
@@ -18,7 +17,8 @@ struct ResourceData;
 struct FontData;
 struct SoundData;
 struct DataHeader;
-enum class FieldType : uint8_t;
+enum class FieldType : uint8_t
+;
 
 /** @brief used for containing all resources/fonts/sounds listed in
  *         for resource/font/sounds bin files at
@@ -44,18 +44,18 @@ struct EgnineBinHeadersData {
 };
 
 class ResourceLoader {
- public:
+public:
   /** @brief used to initialize the ResourceLoader internal streams
    *
-   *  @returns int32_t - error code
+   *  @returns ErrorCode - error code
    * */
-  int32_t init(const std::string &resourcesFolderLocation);
+  ErrorCode init(const std::string &resourcesFolderLocation);
 
   /** @brief used to load and populate the EgnineBinHeadersData
    *
-   *  @returns int32_t - error code
+   *  @returns ErrorCode - error code
    * */
-  int32_t readEngineBinHeaders(EgnineBinHeadersData& outData);
+  ErrorCode readEngineBinHeaders(EgnineBinHeadersData &outData);
 
   /** @brief used to parse single resource from resource bin file
    *
@@ -66,7 +66,7 @@ class ResourceLoader {
    *                 NOTE: unsuccessful read means
    *                                resource bin file.eof() is reached.
    * */
-  bool readResourceChunk(ResourceData& outData);
+  bool readResourceChunk(ResourceData &outData);
 
   /** @brief used to parse single resource from fonts bin file
    *
@@ -76,7 +76,7 @@ class ResourceLoader {
    *                 NOTE: unsuccessful read means
    *                                    fonts bin file.eof() is reached.
    * */
-  bool readFontChunk(FontData& outData);
+  bool readFontChunk(FontData &outData);
 
   /** @brief used to parse single resource from sound bin file
    *
@@ -87,14 +87,14 @@ class ResourceLoader {
    *                 NOTE: unsuccessful read means
    *                                    sound bin file.eof() is reached.
    * */
-  bool readSoundChunk(SoundData& outData);
+  bool readSoundChunk(SoundData &outData);
 
- private:
+private:
   /** @brief used to open file streams for resource/font/sounds bin files
    *
-   *  @returns int32_t - error code
+   *  @returns ErrorCode - error code
    * */
-  int32_t openSourceStreams(const std::string &resourcesBinLocation);
+  ErrorCode openSourceStreams(const std::string &resourcesBinLocation);
 
   /** @brief used to close file streams for resource/font/sounds bin files
    * */
@@ -103,37 +103,38 @@ class ResourceLoader {
   /** @brief used to read  total count of widgets
    *         and their respective file size from resource bin file
    *
-   *  @param uint64_t & - total static widgets count
-   *  @param uint64_t & - total dynamic widgets count
-   *  @param int32_t &  - total widgets file size
+   *  @param uint64_t &  - total static widgets count
+   *  @param uint64_t &  - total dynamic widgets count
+   *  @param int32_t &   - total widgets file size
    *
-   *  @returns int32_t  - error code
+   *  @returns ErrorCode - error code
    * */
-  int32_t readResourceBinHeader(uint64_t& outStaticWidgetsSize,
-                                uint64_t& outDynamicWidgetsSize,
-                                int32_t& outWidgetFileSize);
+  ErrorCode readResourceBinHeader(uint64_t &outStaticWidgetsSize,
+                                  uint64_t &outDynamicWidgetsSize,
+                                  int32_t &outWidgetFileSize);
 
   /** @brief used to read  total count of fonts
    *         and their respective file size from fond bin file
    *
-   *  @param uint64_t * - total fonts count
-   *  @param int32_t *  - total fonts file size
+   *  @param uint64_t *  - total fonts count
+   *  @param int32_t *   - total fonts file size
    *
-   *  @returns int32_t  - error code
+   *  @returns ErrorCode - error code
    * */
-  int32_t readFontBinHeader(uint64_t& outFontsSize, int32_t& outFontsFileSize);
+  ErrorCode readFontBinHeader(uint64_t &outFontsSize,
+                              int32_t &outFontsFileSize);
 
   /** @brief used to read  total count of musics and sound chunks
    *         and their respective file size from sound bin file
    *
    *  @param uint64_t & - total musics count
-   *  @param uint64_t & - total sound chunks count
-   *  @param int32_t &  - total sounds file size
+   *  @param uint64_t &   - total sound chunks count
+   *  @param int32_t &   - total sounds file size
    *
-   *  @returns int32_t  - error code
+   *  @returns ErrorCode - error code
    * */
-  int32_t readSoundBinHeader(uint64_t& outMusicsSize, uint64_t& outChunksSize,
-                             int32_t& outSoundsFileSize);
+  ErrorCode readSoundBinHeader(uint64_t &outMusicsSize, uint64_t &outChunksSize,
+                             int32_t &outSoundsFileSize);
 
   /** @brief used to parse single DataHeader from
    *         resource/font/sounds bin files (they share common header).
@@ -147,7 +148,7 @@ class ResourceLoader {
    *                                destinationStream.eof() is reached.
    * */
   bool readChunkHeaderInternal(const ResourceDefines::FieldType fieldType,
-                               DataHeader& outData);
+                               DataHeader &outData);
 
   // Input file stream for the project resource file
   std::ifstream _resSourceStream;

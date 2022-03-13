@@ -1,9 +1,7 @@
 // Corresponding header
 #include "resource_utils/structs/CombinedStructs.h"
 
-// C system headers
-
-// C++ system headers
+// System headers
 
 // Other libraries headers
 
@@ -21,6 +19,6 @@ void CombinedData::reset() {
   soundLevel.clear();
   tagName.clear();
   type.clear();
-  imageRect = Rectangle::ZERO;
+  imageRect = Rectangles::ZERO;
   spriteData.clear();
 }

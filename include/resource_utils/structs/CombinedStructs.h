@@ -1,9 +1,7 @@
 #ifndef RESOURCE_UTILS_COMBINEDSTRUCTS_H_
 #define RESOURCE_UTILS_COMBINEDSTRUCTS_H_
 
-// C system headers
-
-// C++ system headers
+// System headers
 #include <cstdint>
 #include <string>
 #include <vector>

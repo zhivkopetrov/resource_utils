@@ -1,9 +1,7 @@
 // Corresponding header
 #include "resource_utils/structs/ResourceData.h"
 
-// C system headers
-
-// C++ system headers
+// System headers
 
 // Other libraries headers
 
@@ -25,7 +23,7 @@ ResourceData::ResourceData(const DataHeader &inputHeader,
 
 void ResourceData::reset() {
   header.reset();
-  imageRect = Rectangle::ZERO;
+  imageRect = Rectangles::ZERO;
   spriteData.clear();
   textureLoadType = 0;
   refCount = 0;

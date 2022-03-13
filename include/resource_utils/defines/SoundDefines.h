@@ -1,14 +1,14 @@
 #ifndef RESOURCE_UTILS_SOUNDDEFINES_H_
 #define RESOURCE_UTILS_SOUNDDEFINES_H_
 
-// C system headers
-
-// C++ system headers
+// System headers
 #include <cstdint>
 
 // Other libraries headers
 
 // Own components headers
+
+// Forward declarations
 
 enum class SoundType : uint8_t { UNKNOWN = 0, MUSIC, CHUNK };
 
