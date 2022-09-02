@@ -1,8 +1,15 @@
 # resource_utils
 
-**A static C++ library, which provided auto-generated description for Images, Fonts, Sounds**
-The descriptions:
-- are generated from a command line tools, resource_builder.
+**A static C++ library, which provided auto-generated description for assets**
+
+Supported assets:
+- Images
+- Fonts
+- Sounds
+
+
+The assets:
+- are generated from a command line tool  called "resource_builder".
 The tool can be found here - https://github.com/zhivkopetrov/tools
 - can easily be imported with this library using the ResourceLoader class 
 
