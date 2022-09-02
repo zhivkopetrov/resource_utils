@@ -1,6 +1,6 @@
 # resource_utils
 
-**A static C++ library, which provided auto-generated description for assets**
+**A static C++ library, which provides auto-generated description for assets**
 
 Supported assets:
 - Images
