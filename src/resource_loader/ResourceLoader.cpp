@@ -7,6 +7,7 @@
 
 // Other libraries headers
 #include "utils/data_type/StringUtils.h"
+#include "utils/debug/StrError.h"
 #include "utils/Log.h"
 
 // Own components headers
@@ -60,7 +61,7 @@ ErrorCode ResourceLoader::openSourceStreams(
       std::ifstream::in | std::ifstream::binary);
   if (!_resSourceStream) {
     LOGERR("Error, could not open ifstream for fileName: %s, reason: %s",
-           resFile.c_str(), strerror(errno));
+           resFile.c_str(), strError().c_str());
     return ErrorCode::FAILURE;
   }
 
@@ -70,7 +71,7 @@ ErrorCode ResourceLoader::openSourceStreams(
       std::ifstream::in | std::ifstream::binary);
   if (!_fontsSourceStream) {
     LOGERR("Error, could not open ifstream for fileName: %s, reason: %s",
-          fontFile.c_str(), strerror(errno));
+          fontFile.c_str(), strError().c_str());
     return ErrorCode::FAILURE;
   }
 
@@ -80,7 +81,7 @@ ErrorCode ResourceLoader::openSourceStreams(
       std::ifstream::in | std::ifstream::binary);
   if (!_soundsSourceStream) {
     LOGERR("Error, could not open ifstream for fileName: %s, reason: %s",
-            soundFile.c_str(), strerror(errno));
+            soundFile.c_str(), strError().c_str());
     return ErrorCode::FAILURE;
   }
 
@@ -106,7 +107,7 @@ ErrorCode ResourceLoader::readResourceBinHeader(uint64_t &outStaticWidgetsSize,
     return ErrorCode::FAILURE;
   }
 
-  int32_t parsedArgs = sscanf(line.c_str(), "%lu", &outStaticWidgetsSize);
+  int32_t parsedArgs = sscanf(line.c_str(), "%zu", &outStaticWidgetsSize);
   if (1 != parsedArgs) {
     LOGERR("Internal error, sscanf parsed %d arguments instead of 1",
         parsedArgs);
@@ -124,7 +125,7 @@ ErrorCode ResourceLoader::readResourceBinHeader(uint64_t &outStaticWidgetsSize,
     return ErrorCode::FAILURE;
   }
 
-  parsedArgs = sscanf(line.c_str(), "%lu", &outDynamicWidgetsSize);
+  parsedArgs = sscanf(line.c_str(), "%zu", &outDynamicWidgetsSize);
   if (1 != parsedArgs) {
     LOGERR("Internal error, sscanf parsed %d arguments instead of 1",
         parsedArgs);
@@ -161,7 +162,7 @@ ErrorCode ResourceLoader::readFontBinHeader(uint64_t &outFontsSize,
     return ErrorCode::FAILURE;
   }
 
-  int32_t parsedArgs = sscanf(line.c_str(), "%lu", &outFontsSize);
+  int32_t parsedArgs = sscanf(line.c_str(), "%zu", &outFontsSize);
   if (1 != parsedArgs) {
     LOGERR("Internal error, sscanf parsed %d arguments instead of 1",
         parsedArgs);
@@ -200,7 +201,7 @@ ErrorCode ResourceLoader::readSoundBinHeader(uint64_t &outMusicsSize,
     return ErrorCode::FAILURE;
   }
 
-  int32_t parsedArgs = sscanf(line.c_str(), "%lu", &outMusicsSize);
+  int32_t parsedArgs = sscanf(line.c_str(), "%zu", &outMusicsSize);
   if (1 != parsedArgs) {
     LOGERR("Internal error, sscanf parsed %d arguments instead of 1",
         parsedArgs);
@@ -216,7 +217,7 @@ ErrorCode ResourceLoader::readSoundBinHeader(uint64_t &outMusicsSize,
     }
   }
 
-  parsedArgs = sscanf(line.c_str(), "%lu", &outChunksSize);
+  parsedArgs = sscanf(line.c_str(), "%zu", &outChunksSize);
   if (1 != parsedArgs) {
     LOGERR("Internal error, sscanf parsed %d arguments instead of 1",
         parsedArgs);
