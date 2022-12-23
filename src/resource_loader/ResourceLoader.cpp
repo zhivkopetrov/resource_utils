@@ -1,3 +1,8 @@
+#if defined(_WIN32) || defined(_WIN64)
+  // disable deprecation warnings on windows 
+  #define _CRT_SECURE_NO_WARNINGS
+#endif
+
 // Corresponding header
 #include "resource_utils/resource_loader/ResourceLoader.h"
 
@@ -55,7 +60,20 @@ ErrorCode ResourceLoader::readEngineBinHeaders(EgnineBinHeadersData &outData) {
 
 ErrorCode ResourceLoader::openSourceStreams(
     const std::string &resourcesBinLocation) {
-  const std::string resFile = resourcesBinLocation
+#ifdef __linux__
+  const std::string& path = resourcesBinLocation;
+#else //windows
+  std::string modifiedPath = resourcesBinLocation;
+  for (char& c : modifiedPath) {
+    //substitute UNIX file convetion to windows
+    if ('/' == c) {
+      c = '\\';
+    }
+  }
+  const std::string& path = modifiedPath;
+#endif
+
+  const std::string resFile = path
       + ResourceFileHeader::getResourceBinName();
   _resSourceStream.open(resFile.c_str(),
       std::ifstream::in | std::ifstream::binary);
@@ -65,7 +83,7 @@ ErrorCode ResourceLoader::openSourceStreams(
     return ErrorCode::FAILURE;
   }
 
-  const std::string fontFile = resourcesBinLocation
+  const std::string fontFile = path
       + ResourceFileHeader::getFontBinName();
   _fontsSourceStream.open(fontFile.c_str(),
       std::ifstream::in | std::ifstream::binary);
@@ -75,7 +93,7 @@ ErrorCode ResourceLoader::openSourceStreams(
     return ErrorCode::FAILURE;
   }
 
-  const std::string soundFile = resourcesBinLocation
+  const std::string soundFile = path
       + ResourceFileHeader::getSoundBinName();
   _soundsSourceStream.open(soundFile.c_str(),
       std::ifstream::in | std::ifstream::binary);
