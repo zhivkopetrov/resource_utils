@@ -60,9 +60,7 @@ ErrorCode ResourceLoader::readEngineBinHeaders(EgnineBinHeadersData &outData) {
 
 ErrorCode ResourceLoader::openSourceStreams(
     const std::string &resourcesBinLocation) {
-#ifdef __linux__
-  const std::string& path = resourcesBinLocation;
-#else //windows
+#if defined(_WIN32) || defined(_WIN64)
   std::string modifiedPath = resourcesBinLocation;
   for (char& c : modifiedPath) {
     //substitute UNIX file convetion to windows
@@ -71,6 +69,8 @@ ErrorCode ResourceLoader::openSourceStreams(
     }
   }
   const std::string& path = modifiedPath;
+#else
+  const std::string& path = resourcesBinLocation;
 #endif
 
   const std::string resFile = path
@@ -125,7 +125,7 @@ ErrorCode ResourceLoader::readResourceBinHeader(uint64_t &outStaticWidgetsSize,
     return ErrorCode::FAILURE;
   }
 
-  int32_t parsedArgs = sscanf(line.c_str(), "%zu", &outStaticWidgetsSize);
+  int32_t parsedArgs = sscanf(line.c_str(), "%" PRIu64, &outStaticWidgetsSize);
   if (1 != parsedArgs) {
     LOGERR("Internal error, sscanf parsed %d arguments instead of 1",
         parsedArgs);
@@ -143,7 +143,7 @@ ErrorCode ResourceLoader::readResourceBinHeader(uint64_t &outStaticWidgetsSize,
     return ErrorCode::FAILURE;
   }
 
-  parsedArgs = sscanf(line.c_str(), "%zu", &outDynamicWidgetsSize);
+  parsedArgs = sscanf(line.c_str(), "%" PRIu64, &outDynamicWidgetsSize);
   if (1 != parsedArgs) {
     LOGERR("Internal error, sscanf parsed %d arguments instead of 1",
         parsedArgs);
@@ -180,7 +180,7 @@ ErrorCode ResourceLoader::readFontBinHeader(uint64_t &outFontsSize,
     return ErrorCode::FAILURE;
   }
 
-  int32_t parsedArgs = sscanf(line.c_str(), "%zu", &outFontsSize);
+  int32_t parsedArgs = sscanf(line.c_str(), "%" PRIu64, &outFontsSize);
   if (1 != parsedArgs) {
     LOGERR("Internal error, sscanf parsed %d arguments instead of 1",
         parsedArgs);
@@ -219,7 +219,7 @@ ErrorCode ResourceLoader::readSoundBinHeader(uint64_t &outMusicsSize,
     return ErrorCode::FAILURE;
   }
 
-  int32_t parsedArgs = sscanf(line.c_str(), "%zu", &outMusicsSize);
+  int32_t parsedArgs = sscanf(line.c_str(), "%" PRIu64, &outMusicsSize);
   if (1 != parsedArgs) {
     LOGERR("Internal error, sscanf parsed %d arguments instead of 1",
         parsedArgs);
@@ -235,7 +235,7 @@ ErrorCode ResourceLoader::readSoundBinHeader(uint64_t &outMusicsSize,
     }
   }
 
-  parsedArgs = sscanf(line.c_str(), "%zu", &outChunksSize);
+  parsedArgs = sscanf(line.c_str(), "%" PRIu64, &outChunksSize);
   if (1 != parsedArgs) {
     LOGERR("Internal error, sscanf parsed %d arguments instead of 1",
         parsedArgs);
