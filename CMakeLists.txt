@@ -67,6 +67,11 @@ if(NOT DISABLE_ROS_TOOLING)
     )
 endif()
 
+# detect projects that have not defined cmake_helpers_DIR in their root CMakeLists.txt
+if (NOT ${cmake_helpers_DIR})
+    include(cmake_helpers/helpers.cmake)
+endif()
+
 set_target_cpp_standard(${PROJECT_NAME} 20)
 enable_target_warnings(${PROJECT_NAME})
 set_target_visibility(${PROJECT_NAME})
